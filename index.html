@@ -1,1 +1,1125 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Música - Hub del Artista</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.8/index.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/space-grotesk@5.0.8/index.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#8B5CF6',
+                        secondary: '#EC4899',
+                        dark: '#0F0F1A',
+                        darker: '#070710',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .gradient-text {
+            background: linear-gradient(135deg, #8B5CF6, #EC4899, #F59E0B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #0F0F1A 0%, #1a0533 30%, #0d1b3e 60%, #0F0F1A 100%);
+        }
+        .card-glow:hover {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        }
+        .audio-visualizer {
+            display: flex;
+            align-items: end;
+            gap: 2px;
+            height: 30px;
+        }
+        .audio-bar {
+            width: 3px;
+            background: linear-gradient(to top, #8B5CF6, #EC4899);
+            border-radius: 2px;
+            animation: bounce 0.8s ease-in-out infinite alternate;
+        }
+        .audio-bar:nth-child(1) { animation-delay: 0s; height: 30%; }
+        .audio-bar:nth-child(2) { animation-delay: 0.1s; height: 60%; }
+        .audio-bar:nth-child(3) { animation-delay: 0.2s; height: 40%; }
+        .audio-bar:nth-child(4) { animation-delay: 0.3s; height: 80%; }
+        .audio-bar:nth-child(5) { animation-delay: 0.4s; height: 50%; }
+        .audio-bar:nth-child(6) { animation-delay: 0.15s; height: 70%; }
+        .audio-bar:nth-child(7) { animation-delay: 0.25s; height: 45%; }
+        .audio-bar:nth-child(8) { animation-delay: 0.35s; height: 90%; }
+        @keyframes bounce {
+            0% { transform: scaleY(0.3); }
+            100% { transform: scaleY(1); }
+        }
+        .paused .audio-bar { animation-play-state: paused; }
+        .nav-link { position: relative; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #8B5CF6, #EC4899);
+            transition: width 0.3s;
+        }
+        .nav-link:hover::after { width: 100%; }
+        .merch-card:hover .merch-overlay {
+            opacity: 1;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-animation { animation: float 3s ease-in-out infinite; }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #8B5CF6, #EC4899, transparent);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0F0F1A; }
+        ::-webkit-scrollbar-thumb { background: #8B5CF6; border-radius: 4px; }
+        .modal-overlay {
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-darker text-white overflow-x-hidden">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-darker/80 backdrop-blur-xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="#" class="font-display text-2xl font-bold gradient-text">ARTISTA</a>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#inicio" class="nav-link text-sm text-gray-300 hover:text-white transition">Inicio</a>
+                    <a href="#biografia" class="nav-link text-sm text-gray-300 hover:text-white transition">Biografía</a>
+                    <a href="#musica" class="nav-link text-sm text-gray-300 hover:text-white transition">Música</a>
+                    <a href="#merch" class="nav-link text-sm text-gray-300 hover:text-white transition">Merch</a>
+                    <a href="#galeria" class="nav-link text-sm text-gray-300 hover:text-white transition">Galería</a>
+                    <a href="#videos" class="nav-link text-sm text-gray-300 hover:text-white transition">Videos</a>
+                    <a href="#plataformas" class="nav-link text-sm text-gray-300 hover:text-white transition">Plataformas</a>
+                </div>
+                <button id="mobileMenuBtn" class="md:hidden text-white">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-darker/95 backdrop-blur-xl border-t border-white/5">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#inicio" class="block text-gray-300 hover:text-white transition py-2">Inicio</a>
+                <a href="#biografia" class="block text-gray-300 hover:text-white transition py-2">Biografía</a>
+                <a href="#musica" class="block text-gray-300 hover:text-white transition py-2">Música</a>
+                <a href="#merch" class="block text-gray-300 hover:text-white transition py-2">Merch</a>
+                <a href="#galeria" class="block text-gray-300 hover:text-white transition py-2">Galería</a>
+                <a href="#videos" class="block text-gray-300 hover:text-white transition py-2">Videos</a>
+                <a href="#plataformas" class="block text-gray-300 hover:text-white transition py-2">Plataformas</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-bg min-h-screen flex items-center relative overflow-hidden">
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-96 h-96 bg-secondary/15 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"></div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="audio-visualizer" id="heroVisualizer">
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                            <div class="audio-bar"></div>
+                        </div>
+                        <span class="text-sm text-primary">Nuevo single disponible</span>
+                    </div>
+                    <h1 class="font-display text-5xl sm:text-7xl font-bold mb-6">
+                        <span class="gradient-text">Tu Nombre</span><br>
+                        <span class="text-white">Artístico</span>
+                    </h1>
+                    <p class="text-gray-400 text-lg mb-8 max-w-md">Músico, compositor y artista. Explorando nuevos sonidos y conectando a través de la música.</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#musica" class="px-8 py-3 bg-gradient-to-r from-primary to-secondary rounded-full font-semibold hover:opacity-90 transition transform hover:scale-105">
+                            <i class="fas fa-play mr-2"></i>Escuchar Ahora
+                        </a>
+                        <a href="#merch" class="px-8 py-3 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition">
+                            <i class="fas fa-shopping-bag mr-2"></i>Ver Merch
+                        </a>
+                    </div>
+                    <div class="flex items-center gap-6 mt-10">
+                        <a href="#" class="text-gray-400 hover:text-primary transition text-2xl"><i class="fab fa-spotify"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-secondary transition text-2xl"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-red-500 transition text-2xl"><i class="fab fa-youtube"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-blue-400 transition text-2xl"><i class="fab fa-tiktok"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition text-2xl"><i class="fab fa-soundcloud"></i></a>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <div class="relative float-animation">
+                        <div class="w-72 h-72 sm:w-96 sm:h-96 rounded-2xl bg-gradient-to-br from-primary/30 to-secondary/30 p-1">
+                            <div class="w-full h-full rounded-2xl bg-gradient-to-br from-purple-900/50 to-pink-900/50 flex items-center justify-center overflow-hidden">
+                                <svg class="w-32 h-32 text-white/30" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-4 -right-4 w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                            <i class="fas fa-headphones text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Biografía -->
+    <section id="biografia" class="py-24 bg-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div class="relative">
+                    <div class="w-full aspect-square max-w-md mx-auto rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 p-1">
+                        <div class="w-full h-full rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center overflow-hidden">
+                            <div class="text-center p-8">
+                                <i class="fas fa-camera text-6xl text-primary/50 mb-4"></i>
+                                <p class="text-gray-500 text-sm">Tu foto aquí</p>
+                                <p class="text-gray-600 text-xs mt-2">Reemplaza con tu imagen</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-4 -left-4 w-24 h-24 border-2 border-primary/30 rounded-2xl"></div>
+                    <div class="absolute -bottom-4 -right-4 w-24 h-24 border-2 border-secondary/30 rounded-2xl"></div>
+                </div>
+                <div>
+                    <span class="text-primary text-sm font-semibold uppercase tracking-wider">Sobre mí</span>
+                    <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2 mb-6">Biografía</h2>
+                    <div class="space-y-4 text-gray-400 leading-relaxed">
+                        <p>Escribe aquí tu biografía. Cuenta tu historia, cómo empezaste en la música, tus influencias y lo que te motiva a crear.</p>
+                        <p>Puedes agregar múltiples párrafos con información sobre tu trayectoria, los géneros que exploras, tus logros y proyectos futuros.</p>
+                        <p>Esta sección es perfecta para conectar con tus fans y que conozcan más sobre ti como artista.</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-6 mt-8">
+                        <div class="text-center">
+                            <div class="text-3xl font-bold gradient-text">10+</div>
+                            <div class="text-sm text-gray-500 mt-1">Canciones</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold gradient-text">5K+</div>
+                            <div class="text-sm text-gray-500 mt-1">Oyentes</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-3xl font-bold gradient-text">2</div>
+                            <div class="text-sm text-gray-500 mt-1">Álbumes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Música -->
+    <section id="musica" class="py-24 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Discografía</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Mi Música</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Escucha mis últimos lanzamientos, singles y álbumes completos.</p>
+            </div>
+
+            <!-- Music Player -->
+            <div class="max-w-4xl mx-auto mb-16">
+                <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-white/10 rounded-2xl p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row items-center gap-6">
+                        <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
+                            <i class="fas fa-music text-3xl text-white"></i>
+                        </div>
+                        <div class="flex-1 w-full">
+                            <h3 class="font-display text-xl font-bold mb-1">Nombre del Track</h3>
+                            <p class="text-gray-400 text-sm mb-4">Álbum / Single • 2024</p>
+                            <div class="w-full bg-white/10 rounded-full h-2 mb-2">
+                                <div class="bg-gradient-to-r from-primary to-secondary h-2 rounded-full transition-all duration-300" style="width: 35%" id="progressBar"></div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-500 mb-4">
+                                <span id="currentTime">1:23</span>
+                                <span id="totalTime">3:45</span>
+                            </div>
+                            <div class="flex items-center justify-center gap-6">
+                                <button class="text-gray-400 hover:text-white transition"><i class="fas fa-backward-step text-lg"></i></button>
+                                <button id="playBtn" class="w-12 h-12 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center hover:opacity-90 transition transform hover:scale-110">
+                                    <i class="fas fa-play text-white" id="playIcon"></i>
+                                </button>
+                                <button class="text-gray-400 hover:text-white transition"><i class="fas fa-forward-step text-lg"></i></button>
+                                <div class="flex items-center gap-2 ml-4">
+                                    <i class="fas fa-volume-high text-gray-400 text-sm"></i>
+                                    <div class="w-20 bg-white/10 rounded-full h-1.5">
+                                        <div class="bg-white/60 h-1.5 rounded-full" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track List -->
+            <div class="max-w-4xl mx-auto space-y-3">
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition cursor-pointer group" onclick="selectTrack(this, 'Track 1', '3:45')">
+                    <span class="text-gray-500 group-hover:hidden w-8 text-center">1</span>
+                    <i class="fas fa-play text-primary hidden group-hover:block w-8 text-center"></i>
+                    <div class="w-10 h-10 rounded bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-music text-xs text-primary"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm">Nombre del Track 1</h4>
+                        <p class="text-xs text-gray-500">Single • 2024</p>
+                    </div>
+                    <span class="text-sm text-gray-500">3:45</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition cursor-pointer group" onclick="selectTrack(this, 'Track 2', '4:12')">
+                    <span class="text-gray-500 group-hover:hidden w-8 text-center">2</span>
+                    <i class="fas fa-play text-primary hidden group-hover:block w-8 text-center"></i>
+                    <div class="w-10 h-10 rounded bg-gradient-to-br from-blue-500/30 to-purple-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-music text-xs text-blue-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm">Nombre del Track 2</h4>
+                        <p class="text-xs text-gray-500">Álbum • 2024</p>
+                    </div>
+                    <span class="text-sm text-gray-500">4:12</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition cursor-pointer group" onclick="selectTrack(this, 'Track 3', '3:20')">
+                    <span class="text-gray-500 group-hover:hidden w-8 text-center">3</span>
+                    <i class="fas fa-play text-primary hidden group-hover:block w-8 text-center"></i>
+                    <div class="w-10 h-10 rounded bg-gradient-to-br from-pink-500/30 to-red-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-music text-xs text-pink-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm">Nombre del Track 3</h4>
+                        <p class="text-xs text-gray-500">EP • 2023</p>
+                    </div>
+                    <span class="text-sm text-gray-500">3:20</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition cursor-pointer group" onclick="selectTrack(this, 'Track 4', '5:01')">
+                    <span class="text-gray-500 group-hover:hidden w-8 text-center">4</span>
+                    <i class="fas fa-play text-primary hidden group-hover:block w-8 text-center"></i>
+                    <div class="w-10 h-10 rounded bg-gradient-to-br from-green-500/30 to-teal-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-music text-xs text-green-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm">Nombre del Track 4</h4>
+                        <p class="text-xs text-gray-500">Single • 2023</p>
+                    </div>
+                    <span class="text-sm text-gray-500">5:01</span>
+                </div>
+                <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl hover:bg-white/10 transition cursor-pointer group" onclick="selectTrack(this, 'Track 5', '2:58')">
+                    <span class="text-gray-500 group-hover:hidden w-8 text-center">5</span>
+                    <i class="fas fa-play text-primary hidden group-hover:block w-8 text-center"></i>
+                    <div class="w-10 h-10 rounded bg-gradient-to-br from-yellow-500/30 to-orange-500/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-music text-xs text-yellow-400"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-semibold text-sm">Nombre del Track 5</h4>
+                        <p class="text-xs text-gray-500">Colaboración • 2023</p>
+                    </div>
+                    <span class="text-sm text-gray-500">2:58</span>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="max-w-4xl mx-auto mt-12">
+                <div class="border-2 border-dashed border-white/10 rounded-2xl p-8 text-center hover:border-primary/50 transition cursor-pointer" id="uploadZone">
+                    <i class="fas fa-cloud-arrow-up text-4xl text-primary/50 mb-4"></i>
+                    <h3 class="font-display text-lg font-bold mb-2">Subir Nueva Música</h3>
+                    <p class="text-gray-500 text-sm mb-4">Arrastra tus archivos de audio aquí o haz clic para seleccionar</p>
+                    <p class="text-gray-600 text-xs">Formatos soportados: MP3, WAV, FLAC, OGG (máx. 50MB)</p>
+                    <input type="file" id="audioUpload" accept="audio/*" class="hidden" multiple>
+                    <button onclick="document.getElementById('audioUpload').click()" class="mt-4 px-6 py-2 bg-primary/20 text-primary rounded-full text-sm hover:bg-primary/30 transition">
+                        Seleccionar Archivos
+                    </button>
+                </div>
+                <div id="uploadedList" class="mt-4 space-y-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Merch / Tienda -->
+    <section id="merch" class="py-24 bg-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Tienda</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Merch & Productos</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Lleva tu música contigo. Productos exclusivos y ediciones limitadas.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-purple-900/30 to-pink-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-shirt text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                        <span class="absolute top-4 right-4 bg-secondary text-white text-xs px-3 py-1 rounded-full font-semibold">NUEVO</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Camiseta Oficial</h3>
+                        <p class="text-gray-500 text-sm mb-4">Algodón premium • Diseño exclusivo</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$29.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-blue-900/30 to-purple-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-compact-disc text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                        <span class="absolute top-4 right-4 bg-primary text-white text-xs px-3 py-1 rounded-full font-semibold">LIMITADO</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Vinilo Edición Limitada</h3>
+                        <p class="text-gray-500 text-sm mb-4">Vinilo 12" • 180g • Firmado</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$49.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-green-900/30 to-teal-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-hat-cowboy text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Gorra Bordada</h3>
+                        <p class="text-gray-500 text-sm mb-4">Snapback • Logo bordado</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$24.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-orange-900/30 to-red-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-mug-hot text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Taza Personalizada</h3>
+                        <p class="text-gray-500 text-sm mb-4">Cerámica • 350ml • Diseño único</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$14.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 5 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-indigo-900/30 to-violet-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-bag-shopping text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Hoodie Premium</h3>
+                        <p class="text-gray-500 text-sm mb-4">Fleece • Oversize • Unisex</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$59.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 6 -->
+                <div class="merch-card group bg-white/5 rounded-2xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 card-glow">
+                    <div class="relative aspect-square bg-gradient-to-br from-cyan-900/30 to-blue-900/30 flex items-center justify-center overflow-hidden">
+                        <i class="fas fa-image text-6xl text-white/20"></i>
+                        <div class="merch-overlay absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 transition-opacity duration-300">
+                            <button class="px-6 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition">Ver Detalles</button>
+                        </div>
+                        <span class="absolute top-4 right-4 bg-green-500 text-white text-xs px-3 py-1 rounded-full font-semibold">POPULAR</span>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-display font-bold text-lg mb-1">Poster Firmado</h3>
+                        <p class="text-gray-500 text-sm mb-4">A2 • Papel premium • Numerado</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-2xl font-bold gradient-text">$19.99</span>
+                            <button class="px-4 py-2 bg-white/10 rounded-full text-sm hover:bg-primary transition">
+                                <i class="fas fa-cart-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Galería de Fotos -->
+    <section id="galeria" class="py-24 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Galería</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Fotos</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Momentos capturados en vivo, sesiones de estudio y detrás de cámaras.</p>
+            </div>
+
+            <!-- Photo Upload -->
+            <div class="max-w-2xl mx-auto mb-12">
+                <div class="border-2 border-dashed border-white/10 rounded-2xl p-6 text-center hover:border-primary/50 transition cursor-pointer">
+                    <i class="fas fa-images text-3xl text-primary/50 mb-3"></i>
+                    <p class="text-gray-400 text-sm">Subir fotos a la galería</p>
+                    <input type="file" id="photoUpload" accept="image/*" class="hidden" multiple>
+                    <button onclick="document.getElementById('photoUpload').click()" class="mt-3 px-4 py-2 bg-primary/20 text-primary rounded-full text-xs hover:bg-primary/30 transition">
+                        Seleccionar Fotos
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="photoGallery">
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group" onclick="openLightbox(0)">
+                    <div class="w-full h-full bg-gradient-to-br from-purple-800/40 to-pink-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-microphone-lines text-4xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group md:col-span-2 md:row-span-2" onclick="openLightbox(1)">
+                    <div class="w-full h-full bg-gradient-to-br from-blue-800/40 to-indigo-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-guitar text-6xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group" onclick="openLightbox(2)">
+                    <div class="w-full h-full bg-gradient-to-br from-green-800/40 to-teal-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-drum text-4xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group" onclick="openLightbox(3)">
+                    <div class="w-full h-full bg-gradient-to-br from-orange-800/40 to-red-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-headphones text-4xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group" onclick="openLightbox(4)">
+                    <div class="w-full h-full bg-gradient-to-br from-cyan-800/40 to-blue-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-music text-4xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+                <div class="gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group" onclick="openLightbox(5)">
+                    <div class="w-full h-full bg-gradient-to-br from-yellow-800/40 to-orange-800/40 flex items-center justify-center transition-transform duration-500">
+                        <i class="fas fa-record-vinyl text-4xl text-white/20"></i>
+                    </div>
+                    <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                        <i class="fas fa-expand text-2xl text-white"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Videos -->
+    <section id="videos" class="py-24 bg-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Visual</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Videos</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Videoclips, sesiones en vivo y contenido exclusivo.</p>
+            </div>
+
+            <!-- Featured Video -->
+            <div class="max-w-4xl mx-auto mb-12">
+                <div class="relative aspect-video rounded-2xl overflow-hidden bg-gradient-to-br from-purple-900/30 to-pink-900/30 border border-white/10 group cursor-pointer">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary/50 transition mx-auto">
+                                <i class="fas fa-play text-3xl text-white ml-1"></i>
+                            </div>
+                            <h3 class="font-display text-xl font-bold">Video Destacado</h3>
+                            <p class="text-gray-400 text-sm mt-1">Videoclip Oficial • 2024</p>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="font-semibold">Nombre del Video</h4>
+                                <p class="text-gray-400 text-sm">1.2M visualizaciones</p>
+                            </div>
+                            <span class="text-sm text-gray-400">4:32</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Grid -->
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="video-card bg-white/5 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 cursor-pointer">
+                    <div class="relative aspect-video bg-gradient-to-br from-blue-900/30 to-indigo-900/30 flex items-center justify-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-primary/50 transition">
+                            <i class="fas fa-play text-white ml-0.5"></i>
+                        </div>
+                        <span class="absolute bottom-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded">3:45</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-sm mb-1">Sesión en Vivo - Estudio</h4>
+                        <p class="text-gray-500 text-xs">Hace 2 semanas • 45K vistas</p>
+                    </div>
+                </div>
+                <div class="video-card bg-white/5 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 cursor-pointer">
+                    <div class="relative aspect-video bg-gradient-to-br from-green-900/30 to-teal-900/30 flex items-center justify-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-primary/50 transition">
+                            <i class="fas fa-play text-white ml-0.5"></i>
+                        </div>
+                        <span class="absolute bottom-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded">5:12</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-sm mb-1">Acústico unplugged</h4>
+                        <p class="text-gray-500 text-xs">Hace 1 mes • 120K vistas</p>
+                    </div>
+                </div>
+                <div class="video-card bg-white/5 rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 cursor-pointer">
+                    <div class="relative aspect-video bg-gradient-to-br from-red-900/30 to-orange-900/30 flex items-center justify-center">
+                        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-primary/50 transition">
+                            <i class="fas fa-play text-white ml-0.5"></i>
+                        </div>
+                        <span class="absolute bottom-2 right-2 bg-black/70 text-xs px-2 py-0.5 rounded">2:30</span>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-semibold text-sm mb-1">Behind the scenes</h4>
+                        <p class="text-gray-500 text-xs">Hace 2 meses • 78K vistas</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YouTube Embed Info -->
+            <div class="max-w-4xl mx-auto mt-12 text-center">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+                    <i class="fab fa-youtube text-3xl text-red-500 mb-3"></i>
+                    <h3 class="font-display font-bold text-lg mb-2">Conecta tu canal de YouTube</h3>
+                    <p class="text-gray-400 text-sm mb-4">Pega los enlaces de tus videos de YouTube para mostrarlos aquí automáticamente.</p>
+                    <input type="text" placeholder="https://youtube.com/watch?v=..." class="w-full max-w-md px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm focus:outline-none focus:border-primary transition">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Plataformas de Compra -->
+    <section id="plataformas" class="py-24 bg-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Escúchame en</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Plataformas</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Mi música disponible en todas las plataformas digitales. Elige la tuya.</p>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-green-500/50 hover:bg-green-500/10 transition group">
+                    <i class="fab fa-spotify text-4xl text-green-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Spotify</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-pink-500/50 hover:bg-pink-500/10 transition group">
+                    <i class="fab fa-apple text-4xl text-pink-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Apple Music</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-red-500/50 hover:bg-red-500/10 transition group">
+                    <i class="fab fa-youtube text-4xl text-red-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">YouTube Music</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-orange-500/50 hover:bg-orange-500/10 transition group">
+                    <i class="fab fa-soundcloud text-4xl text-orange-500 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">SoundCloud</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-blue-500/50 hover:bg-blue-500/10 transition group">
+                    <i class="fab fa-amazon text-4xl text-blue-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Amazon Music</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-cyan-500/50 hover:bg-cyan-500/10 transition group">
+                    <i class="fab fa-deezer text-4xl text-cyan-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Deezer</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-purple-500/50 hover:bg-purple-500/10 transition group">
+                    <i class="fab fa-tiktok text-4xl text-white group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">TikTok</span>
+                </a>
+                <a href="#" class="flex flex-col items-center gap-3 p-6 bg-white/5 rounded-2xl border border-white/5 hover:border-yellow-500/50 hover:bg-yellow-500/10 transition group">
+                    <i class="fab fa-bandcamp text-4xl text-yellow-400 group-hover:scale-110 transition-transform"></i>
+                    <span class="text-sm font-medium">Bandcamp</span>
+                </a>
+            </div>
+
+            <!-- Smart Link -->
+            <div class="max-w-2xl mx-auto mt-12 text-center">
+                <div class="bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-2xl p-8">
+                    <h3 class="font-display text-xl font-bold mb-2">🔗 Smart Link</h3>
+                    <p class="text-gray-400 text-sm mb-4">Un solo enlace para todas las plataformas. Comparte este link con tus fans.</p>
+                    <div class="flex items-center gap-2 max-w-md mx-auto">
+                        <input type="text" value="https://tu-link.com/artista" readonly class="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-sm focus:outline-none">
+                        <button onclick="copyLink()" class="px-4 py-2 bg-primary rounded-full text-sm font-semibold hover:bg-primary/80 transition" id="copyBtn">
+                            <i class="fas fa-copy mr-1"></i> Copiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- Sección: Cómo poner tu página en línea -->
+    <section class="py-24 bg-darker">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-primary text-sm font-semibold uppercase tracking-wider">Guía</span>
+                <h2 class="font-display text-4xl sm:text-5xl font-bold mt-2">Cómo Poner Tu Página en Línea</h2>
+                <p class="text-gray-400 mt-4 max-w-2xl mx-auto">Todo lo que necesitas para lanzar tu plataforma de artista al mundo.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Paso 1 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-primary font-bold text-lg">1</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Dominio y Hosting</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Compra un dominio (.com, .music, .art)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Hosting: <strong class="text-white">Vercel</strong> (gratis), <strong class="text-white">Netlify</strong> (gratis), o <strong class="text-white">Hostinger</strong></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>O usa <strong class="text-white">GitHub Pages</strong> gratis</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-secondary/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-secondary font-bold text-lg">2</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Base de Datos (Supabase)</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Crea cuenta gratis en <strong class="text-white">supabase.com</strong></li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Guarda tracks, productos, fotos en la base de datos</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Supabase Storage para archivos de audio e imágenes</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Autenticación para panel de administración</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-blue-400 font-bold text-lg">3</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Cuentas Necesarias</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i><strong class="text-white">Distribuidor musical:</strong> DistroKid, TuneCore o CD Baby</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i><strong class="text-white">Spotify for Artists</strong> - perfil verificado</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i><strong class="text-white">Tienda online:</strong> Shopify, BigCartel o WooCommerce</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i><strong class="text-white">Pagos:</strong> Stripe o PayPal para cobrar</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 4 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-green-400 font-bold text-lg">4</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Subir Música</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Graba en WAV de alta calidad (44.1kHz, 16-bit mínimo)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Masteriza tus tracks antes de distribuir</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Sube a tu distribuidor → llega a todas las plataformas</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Para preview en tu web: archivos MP3 en Supabase Storage</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 5 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-yellow-400 font-bold text-lg">5</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Merch & Ventas</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i><strong class="text-white">Print-on-demand:</strong> Printful, Printify (sin inventario)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Integra con Shopify o vende directo con Stripe</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Configura envíos y precios</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Botones de compra enlazan a tu tienda</li>
+                    </ul>
+                </div>
+
+                <!-- Paso 6 -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-primary/30 transition">
+                    <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-pink-400 font-bold text-lg">6</span>
+                    </div>
+                    <h3 class="font-display text-xl font-bold mb-3">Lanzar y Promocionar</h3>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Conecta tu dominio al hosting (DNS)</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Configura SSL (HTTPS) - gratis en Vercel/Netlify</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>Comparte tu link en redes sociales</li>
+                        <li class="flex items-start gap-2"><i class="fas fa-check text-green-400 mt-1 text-xs"></i>¡Tu página está en línea! 🎉</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Resumen de costos -->
+            <div class="max-w-4xl mx-auto mt-16">
+                <div class="bg-gradient-to-r from-primary/5 to-secondary/5 border border-white/10 rounded-2xl p-8">
+                    <h3 class="font-display text-2xl font-bold mb-6 text-center">💰 Resumen de Costos Estimados</h3>
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">Dominio (.com)</span>
+                            <span class="font-bold text-green-400">~$10-15/año</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">Hosting (Vercel/Netlify)</span>
+                            <span class="font-bold text-green-400">GRATIS</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">Supabase (Base de datos)</span>
+                            <span class="font-bold text-green-400">GRATIS</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">DistroKid (distribución)</span>
+                            <span class="font-bold text-yellow-400">~$20/año</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">Shopify (tienda)</span>
+                            <span class="font-bold text-yellow-400">~$1/mes (plan básico)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                            <span class="text-gray-300">Printful (print-on-demand)</span>
+                            <span class="font-bold text-green-400">GRATIS (pagas por producto)</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-400 text-sm">Total mínimo para empezar: <strong class="text-white text-lg">~$30-50/año</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-darker border-t border-white/5 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8 items-center">
+                <div>
+                    <a href="#" class="font-display text-2xl font-bold gradient-text">ARTISTA</a>
+                    <p class="text-gray-500 text-sm mt-2">Música • Arte • Cultura</p>
+                </div>
+                <div class="flex justify-center gap-6">
+                    <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-primary/20 transition">
+                        <i class="fab fa-spotify text-green-500"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-pink-500/20 transition">
+                        <i class="fab fa-instagram text-pink-500"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-red-500/20 transition">
+                        <i class="fab fa-youtube text-red-500"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-blue-500/20 transition">
+                        <i class="fab fa-tiktok text-white"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-blue-500/20 transition">
+                        <i class="fab fa-twitter text-blue-400"></i>
+                    </a>
+                </div>
+                <div class="text-right">
+                    <p class="text-gray-500 text-sm">© 2024 Tu Nombre Artístico</p>
+                    <p class="text-gray-600 text-xs mt-1">Todos los derechos reservados</p>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-white/5 text-center">
+                <p class="text-gray-600 text-xs">
+                    Hecho con <i class="fas fa-heart text-secondary text-xs"></i> | 
+                    <a href="#" class="hover:text-primary transition">Política de Privacidad</a> | 
+                    <a href="#" class="hover:text-primary transition">Términos</a> | 
+                    <a href="mailto:contacto@tuartista.com" class="hover:text-primary transition">Contacto</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay bg-black/90">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
+            <i class="fas fa-times text-white"></i>
+        </button>
+        <div class="max-w-4xl max-h-[80vh] p-4">
+            <div class="w-full aspect-video bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl flex items-center justify-center">
+                <div class="text-center">
+                    <i class="fas fa-image text-6xl text-white/20 mb-4"></i>
+                    <p class="text-gray-400">Vista previa de imagen</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-green-500/90 text-white px-6 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage">Acción completada</span>
+        </div>
+    </div>
+
+    <script>
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+        });
+
+        // Play Button
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const heroVisualizer = document.getElementById('heroVisualizer');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            if (isPlaying) {
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+                heroVisualizer.classList.remove('paused');
+            } else {
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+                heroVisualizer.classList.add('paused');
+            }
+        });
+
+        // Track Selection
+        function selectTrack(element, name, duration) {
+            document.querySelectorAll('[onclick^="selectTrack"]').forEach(el => {
+                el.classList.remove('bg-primary/10', 'border-primary/30');
+            });
+            element.classList.add('bg-primary/10');
+            document.querySelector('#musica h3').textContent = name;
+            document.getElementById('totalTime').textContent = duration;
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // Auto play
+            if (!isPlaying) {
+                playBtn.click();
+            }
+            showToast(`Reproduciendo: ${name}`);
+        }
+
+        // Audio Upload
+        const audioUpload = document.getElementById('audioUpload');
+        const uploadedList = document.getElementById('uploadedList');
+        const uploadZone = document.getElementById('uploadZone');
+
+        audioUpload.addEventListener('change', (e) => {
+            const files = e.target.files;
+            Array.from(files).forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-4 p-3 bg-primary/10 border border-primary/20 rounded-xl';
+                div.innerHTML = `
+                    <i class="fas fa-music text-primary"></i>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${file.name}</p>
+                        <p class="text-xs text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                    <i class="fas fa-check-circle text-green-400"></i>
+                `;
+                uploadedList.appendChild(div);
+            });
+            showToast(`${files.length} archivo(s) cargado(s)`);
+        });
+
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-primary', 'bg-primary/5');
+        });
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-primary', 'bg-primary/5');
+        });
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-primary', 'bg-primary/5');
+            const files = e.dataTransfer.files;
+            audioUpload.files = files;
+            audioUpload.dispatchEvent(new Event('change'));
+        });
+
+        // Photo Upload
+        const photoUpload = document.getElementById('photoUpload');
+        const photoGallery = document.getElementById('photoGallery');
+
+        photoUpload.addEventListener('change', (e) => {
+            const files = e.target.files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item relative aspect-square rounded-xl overflow-hidden cursor-pointer group';
+                    div.innerHTML = `
+                        <img src="${ev.target.result}" class="w-full h-full object-cover transition-transform duration-500" alt="${file.name}">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <i class="fas fa-expand text-2xl text-white"></i>
+                        </div>
+                    `;
+                    photoGallery.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+            showToast(`${files.length} foto(s) agregada(s) a la galería`);
+        });
+
+        // Lightbox
+        function openLightbox(index) {
+            document.getElementById('lightbox').classList.remove('hidden');
+            document.getElementById('lightbox').classList.add('flex');
+        }
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.add('hidden');
+            document.getElementById('lightbox').classList.remove('flex');
+        }
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('lightbox')) closeLightbox();
+        });
+
+        // Copy Link
+        function copyLink() {
+            const input = document.querySelector('#plataformas input[type="text"]');
+            navigator.clipboard.writeText(input.value).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '<i class="fas fa-check mr-1"></i> ¡Copiado!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-copy mr-1"></i> Copiar';
+                }, 2000);
+            });
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg', 'shadow-black/20');
+            } else {
+                nav.classList.remove('shadow-lg', 'shadow-black/20');
+            }
+        });
+
+        // Simulate progress bar
+        let progress = 35;
+        setInterval(() => {
+            if (isPlaying) {
+                progress += 0.5;
+                if (progress > 100) progress = 0;
+                document.getElementById('progressBar').style.width = progress + '%';
+                
+                const totalSeconds = 225; // 3:45
+                const currentSeconds = Math.floor((progress / 100) * totalSeconds);
+                const mins = Math.floor(currentSeconds / 60);
+                const secs = currentSeconds % 60;
+                document.getElementById('currentTime').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            }
+        }, 500);
+    </script>
+</body>
+</html>
